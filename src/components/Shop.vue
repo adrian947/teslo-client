@@ -3,12 +3,10 @@ import axios from '../config/axios.js';
 import { ref, onMounted } from 'vue';
 import { Product } from '../interface/product.interface';
 import { defineEmits } from 'vue';
-import { connectToServer } from '../config/socket-io';
 import Chat from './Chat.vue';
 const emit = defineEmits(['logout']);
 
 const products = ref<Product[]>([]);
-const isChatWindowVisible = ref<boolean>(false);
 
 onMounted(async () => {
   try {
@@ -26,11 +24,6 @@ const getImageUrl = (image: string) => {
 
 const handleLogOut = () => {
   emit('logout');
-};
-
-const toggleChat = () => {
-  isChatWindowVisible.value = !isChatWindowVisible.value;
-  console.log("🚀 ~ isChatWindowVisible.value:", isChatWindowVisible.value)
 };
 </script>
 
@@ -52,8 +45,10 @@ const toggleChat = () => {
         </v-card>
       </v-col>
     </v-row>
+    <div class="mt-2 d-flex justify-end">
+      <Chat />
+    </div>
   </v-container>
-  <v-btn @click="toggleChat"> Open Chat </v-btn>
-  <Chat :initialShowChatWindow="isChatWindowVisible"/>
-  <!-- {{ connectToServer() }} -->
+
+  
 </template>

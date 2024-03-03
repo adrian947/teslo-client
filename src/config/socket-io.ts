@@ -1,10 +1,17 @@
-import { Manager } from "socket.io-client"
+import { Manager, Socket } from "socket.io-client"
 
-export const connectToServer = ()=>{
+let socket: Socket
 
-    const manager = new Manager(`${import.meta.env.VITE_BASE_URL_BACKEND}/socket.io/socket.io.js`)
-
-    const socket = manager.socket('/');
-    console.log("🚀 ~ socket :", socket )
-
+export const connectToServer = async () => {
+    const manager = new Manager(`${import.meta.env.VITE_BASE_URL_BACKEND}/socket.io/socket.io.js`, {
+        extraHeaders: {
+            authentication: localStorage.getItem('token') as string
+        }
+    })
+    socket?.removeAllListeners();
+    socket = manager.socket('/');
+    return socket
 }
+
+
+
