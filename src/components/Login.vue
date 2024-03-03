@@ -26,8 +26,8 @@
 import { ref } from 'vue';
 import axios from '../config/axios.js';
 
-import { defineEmits } from 'vue'
-const emit = defineEmits(['login'])
+import { defineEmits } from 'vue';
+const emit = defineEmits(['login']);
 
 const email = ref('usuario3@example.com');
 const password = ref('Contrasena3');
@@ -38,17 +38,12 @@ const login = async () => {
       email: email.value,
       password: password.value,
     });
-    
 
     if (data) {
       const token = data.token;
-
-      // Guardar el token en localStorage
+      const fullname = data.fullname;
       localStorage.setItem('token', token);
-
-	  emit('login', token);
-
-      // Lógica adicional después de iniciar sesión, redireccionar, etc.
+      emit('login', { token, fullname });
     } else {
       console.error('Credenciales incorrectas');
     }

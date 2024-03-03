@@ -4,6 +4,8 @@ import Login from './components/Login.vue';
 import { ref, onMounted } from 'vue';
 
 const isLogin = ref<boolean>(false);
+const fullname = ref<string | null>(null);
+
 onMounted(() => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -11,8 +13,9 @@ onMounted(() => {
   }
 });
 
-const getToken = (data: string) => {
-  isLogin.value = data ? true : false;
+const getToken = (data: {token: string, fullname: string}) => {  
+  isLogin.value = data.token ? true : false;
+  fullname.value = data.fullname;  
 };
 const logOut = () => {
   isLogin.value = false;
@@ -23,6 +26,6 @@ const logOut = () => {
 <template>
   <div>
     <Login @login="getToken" v-if="!isLogin" />
-    <Shop v-else @logout="logOut"/>
+    <Shop v-else @logout="logOut" :fullname="fullname"/>
   </div>
 </template>

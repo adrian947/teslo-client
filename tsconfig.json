@@ -7,6 +7,8 @@
     "skipLibCheck": true,
     "noImplicitAny": false,
     "types": ["vuetify"],
+    "allowJs": true,
+    "sourceMap": true,
     
 
     /* Bundler mode */

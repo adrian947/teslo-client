@@ -6,6 +6,12 @@ import { defineEmits } from 'vue';
 import Chat from './Chat.vue';
 const emit = defineEmits(['logout']);
 
+interface Props {
+  fullname: string;
+}
+
+const { fullname } = defineProps<Props>();
+
 const products = ref<Product[]>([]);
 
 onMounted(async () => {
@@ -28,8 +34,9 @@ const handleLogOut = () => {
 </script>
 
 <template>
-  <v-container>
+  <v-container class="d-flex align-center justify-space-between">
     <v-btn @click="handleLogOut"> Close Session </v-btn>
+    <p>{{ fullname }}</p>
   </v-container>
   <v-container>
     <v-row>
@@ -46,9 +53,7 @@ const handleLogOut = () => {
       </v-col>
     </v-row>
     <div class="mt-2 d-flex justify-end">
-      <Chat />
+      <Chat :fullname="fullname"/>
     </div>
   </v-container>
-
-  
 </template>

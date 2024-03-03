@@ -7,17 +7,18 @@
         <v-spacer></v-spacer>
         <v-btn icon @click="closeChatWindow"> X </v-btn>
       </v-card-title>
-      <v-list>
-		<h6>Users connected</h6>
-        <v-list-item v-for="client in clientsConnected" :key="client">
-          <v-list-item-title>{{ client }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
+      <Select
+        :clientsConnected="clientsConnected"
+        @socketId="setSocketClientId"
+      />
+
       <v-card-text>
         <h6>Messages</h6>
         <v-list>
           <v-list-item v-for="(message, index) in messages" :key="index">
-            <v-list-item-title>{{ message.fullName }}: {{ message.message}}</v-list-item-title>
+            <v-list-item-title
+              >{{ message.fullName }}: {{ message.message }}</v-list-item-title
+            >
           </v-list-item>
         </v-list>
       </v-card-text>
@@ -37,6 +38,7 @@
 import { ref, onMounted } from 'vue';
 import { connectToServer } from '../config/socket-io';
 import { Socket } from 'socket.io-client';
+import Select from './Select.vue';
 
 const showChatWindow = ref(false);
 const statusSocket = ref('disconnect');
@@ -44,11 +46,21 @@ const messages = ref<string[]>([]);
 const socket = ref<Socket | null>(null);
 const clientsConnected = ref<string[]>([]);
 const newMessage = ref('');
+const selectedClientSocketId = ref('');
+
+interface Props {
+  fullname: string;
+}
+
+const { fullname } = defineProps<Props>();
 
 onMounted(() => {
   getStatusSocket();
 });
 
+const setSocketClientId = (socketId: string) => {
+  selectedClientSocketId.value = socketId;
+};
 const openChatWindow = () => {
   showChatWindow.value = true;
 };
@@ -59,11 +71,19 @@ const closeChatWindow = () => {
 
 const sendMessage = () => {
   if (newMessage.value.trim() !== '') {
-    socket.value.emit('message-from-client', {
-      id: 'YO',
-      message: newMessage.value,
-    });
-   
+    if (selectedClientSocketId.value) {
+      socket.value.emit('send-message-to-client', {
+        id: selectedClientSocketId.value,
+        message: newMessage.value,
+      });
+    } else {
+		
+      socket.value.emit('message-from-client', {
+        id: 'YO',
+        message: newMessage.value,
+      });
+    }
+
     newMessage.value = '';
   }
 };
@@ -84,13 +104,12 @@ const listenStatusSocket = (socket: Socket): Promise<string> => {
     });
 
     socket.on('clients-updated', (clients: string[]) => {
-      clientsConnected.value = clients;
+      clientsConnected.value = clients.filter((e) => e.fullname !== fullname);
     });
     socket.on(
       'message-from-server',
-      (payload: { fullName: string; message: string }) => { 
-		messages.value.push(payload);
-        
+      (payload: { fullName: string; message: string }) => {
+        messages.value.push(payload);
       }
     );
   });
